@@ -29,31 +29,40 @@ export default class OrderRepository {
     // Get all items of order from DB
     const orderItemsDB = await OrderItemModel.findAll({ where: { order_id: entity.id } });
 
-    // Create items that not exist on DB
-		for (const item of entity.items) {
-			const itemExistDB = orderItemsDB.find((itemDB) => itemDB.id === item.id);
+    // Convert array of objects to one object
+    const orderItemsDBObj = orderItemsDB.reduce((obj, item) => Object.assign(obj, { [item.id]: item }), {});
+    const orderItemsObj = entity.items.reduce((obj, item) => Object.assign(obj, { [item.id]: item }), {});
 
-			if (!itemExistDB) {
-        await OrderItemModel.create(
-          {
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            product_id: item.productId,
-            quantity: item.quantity,
-            order_id: entity.id
-          },
-        );
-			}
+    // Get all available IDs
+    const orderItemsIdsDB = new Set(Object.keys(orderItemsDBObj));
+    const orderItemsIds = new Set(Object.keys(orderItemsObj));
+
+    // Set difference - Items that dont exist on DB
+    const orderItemsNotExistOnDB = new Set([...orderItemsIds].filter(x => !orderItemsIdsDB.has(x)));
+
+    // Create items that not exist on DB
+		for (const itemId of orderItemsNotExistOnDB) {
+
+      const item = orderItemsObj[itemId as keyof typeof orderItemsObj]
+
+      await OrderItemModel.create(
+        {
+          id: item["id"],
+          name: item["name"],
+          price: item["price"],
+          product_id: item["productId"],
+          quantity: item["quantity"],
+          order_id: entity.id
+        },
+      );
 		}
 
-    // Delete items that not exist on entity
-		for (const item of orderItemsDB) {
-			const itemExistDB = entity.items.find((itemDB) => itemDB.id === item.id);
+    // Set difference - Items that should be deleted from DB
+    const orderItemsDeleteDB = new Set([...orderItemsIdsDB].filter(x => !orderItemsIds.has(x)));
 
-			if (!itemExistDB) {
-        await OrderItemModel.destroy({ where: { id: item.id } });
-			}
+    // Delete items that not exist on entity
+		for (const itemId of orderItemsDeleteDB) {
+      await OrderItemModel.destroy({ where: { id: itemId } });
 		}
 
     // Update the total order
