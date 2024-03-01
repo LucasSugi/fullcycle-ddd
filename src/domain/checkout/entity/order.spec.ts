@@ -59,4 +59,22 @@ describe("Order unit tests", () => {
 
   });
 
+  it("should remove an item", () => {
+
+    const item1 = new OrderItem("i1", "Item 1", 100, "p1", 1);
+    const item2 = new OrderItem("i2", "Item 2", 200, "p2", 2);
+
+    const order = new Order("o1", "c1", [item1, item2]);
+
+    expect(order.items.length).toBe(2);
+    expect(order.total()).toBe(500);
+
+    order.removeItem("i2");
+
+    expect(order.items.length).toBe(1);
+    expect(order.total()).toBe(100);
+    expect(order.items[0].id).toBe("i1");
+
+  });
+
 });

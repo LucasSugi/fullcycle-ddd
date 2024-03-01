@@ -47,6 +47,10 @@ export default class Order {
       this._items.push(item)
   }
 
+  removeItem(order_id: string): void {
+    this._items = this._items.filter(orderItem => orderItem.id !== order_id)
+  }
+
   total(): number {
     return this._items.reduce((acc, item) => acc + item.total(), 0);
   }
