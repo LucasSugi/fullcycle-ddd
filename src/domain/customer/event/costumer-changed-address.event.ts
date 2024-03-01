@@ -1,6 +1,6 @@
 import EventInterface from "../../@shared/event/event.interface";
 
-interface ConsumerChangedAddressEventData {
+interface CostumerChangedAddressEventData {
     id: string;
     name: string;
     street: string,
@@ -9,11 +9,11 @@ interface ConsumerChangedAddressEventData {
     city: string,
 }
 
-export default class ConsumerChangedAddressEvent implements EventInterface {
+export default class CostumerChangedAddressEvent implements EventInterface {
   dataTimeOccurred: Date;
   eventData: any;
 
-  constructor(eventData: ConsumerChangedAddressEventData) {
+  constructor(eventData: CostumerChangedAddressEventData) {
     this.dataTimeOccurred = new Date();
     this.eventData = eventData;
   }

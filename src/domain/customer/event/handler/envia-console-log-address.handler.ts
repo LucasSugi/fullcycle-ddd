@@ -1,10 +1,10 @@
 import EventHandlerInterface from "../../../@shared/event/event-handler.interface";
-import ConsumerChangedAddressEvent from "../consumer-changed-address.event";
+import CostumerChangedAddressEvent from "../costumer-changed-address.event";
 
 export default class EnviaConsoleLogAddressHandler
-  implements EventHandlerInterface<ConsumerChangedAddressEvent>
+  implements EventHandlerInterface<CostumerChangedAddressEvent>
 {
-  handle(event: ConsumerChangedAddressEvent): void {
+  handle(event: CostumerChangedAddressEvent): void {
     console.log(`Endereço do cliente: ${event.id}, ${event.name} alterado para: ${event.address}`);
   }
 }

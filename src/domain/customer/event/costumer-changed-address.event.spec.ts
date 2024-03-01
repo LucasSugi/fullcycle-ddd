@@ -1,9 +1,9 @@
 import EventDispatcher from "../../@shared/event/event-dispatcher";
-import ConsumerChangedAddressEvent from "./consumer-changed-address.event";
+import CostumerChangedAddressEvent from "./costumer-changed-address.event";
 import EnviaConsoleLogAddressHandler from "./handler/envia-console-log-address.handler";
 
 describe("Domain events tests", () => {
-  it("should notify when consumer changed address", () => {
+  it("should notify when costumer changed address", () => {
 
     const eventDispatcher = new EventDispatcher();
 
@@ -11,9 +11,9 @@ describe("Domain events tests", () => {
 
     const spyEventHandler = jest.spyOn(eventHandler, "handle");
 
-    eventDispatcher.register("ConsumerChangedAddressEvent", eventHandler);
+    eventDispatcher.register("CostumerChangedAddressEvent", eventHandler);
 
-    const consumerEvent = new ConsumerChangedAddressEvent({
+    const costumerEvent = new CostumerChangedAddressEvent({
         id: "123",
         name: "name 1",
         street: "street 1",
@@ -22,7 +22,7 @@ describe("Domain events tests", () => {
         city: "city 1",
     });
 
-    eventDispatcher.notify(consumerEvent);
+    eventDispatcher.notify(costumerEvent);
 
     expect(spyEventHandler).toHaveBeenCalled();
   });
