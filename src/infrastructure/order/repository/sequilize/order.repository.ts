@@ -47,6 +47,15 @@ export default class OrderRepository {
 			}
 		}
 
+    // Delete items that not exist on entity
+		for (const item of orderItemsDB) {
+			const itemExistDB = entity.items.find((itemDB) => itemDB.id === item.id);
+
+			if (!itemExistDB) {
+        await OrderItemModel.destroy({ where: { id: item.id } });
+			}
+		}
+
     // Update the total order
     await OrderModel.update(
       {

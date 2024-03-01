@@ -90,7 +90,7 @@ describe("Order repository test", () => {
     const orderRepository = new OrderRepository();
 
     // Create customer
-    const customer = new Customer("123", "Customer 1");
+    const customer = new Customer("c1", "Customer 1");
     const address = new Address("Street 1", 1, "Zipcode 1", "City 1");
     customer.changeAddress(address);
 
@@ -113,12 +113,12 @@ describe("Order repository test", () => {
     );
 
     // Create order
-    const order = new Order("123", "123", [orderItem1]);
+    const order = new Order("o1", customer.id, [orderItem1]);
 
     // Create order on DB
     await orderRepository.create(order);
 
-    /* UPDATE */
+    /* UPDATE - ADD */
 
     // Create Product to Update
     const product2 = new Product("p2", "Product 2", 20);
@@ -142,15 +142,16 @@ describe("Order repository test", () => {
     await orderRepository.update(order)
 
     // Get order updated from DB
-    const orderUpdated = await OrderModel.findOne({
+    const orderUpdated1 = await OrderModel.findOne({
       where: { id: order.id },
       include: ["items"],
     });
 
     // Check
-    expect(orderUpdated.toJSON()).toStrictEqual({
-      id: "123",
-      customer_id: "123",
+    expect(orderUpdated1.items.length).toBe(2);
+    expect(orderUpdated1.toJSON()).toStrictEqual({
+      id: order.id,
+      customer_id: customer.id,
       total: order.total(),
       items: order.items.map((orderItem) => ({
         id: orderItem.id,
@@ -161,6 +162,37 @@ describe("Order repository test", () => {
         product_id: orderItem.productId,
       })),
     });
+
+    /* UPDATE - REMOVE */
+
+    // Remove item
+    order.removeItem(orderItem2.id);
+
+    // Update order on DB
+    await orderRepository.update(order)
+
+    // Get order updated from DB
+    const orderUpdated2 = await OrderModel.findOne({
+      where: { id: order.id },
+      include: ["items"],
+    });
+
+    // Check
+    expect(orderUpdated2.items.length).toBe(1);
+    expect(orderUpdated2.toJSON()).toStrictEqual({
+      id: order.id,
+      customer_id: customer.id,
+      total: order.total(),
+      items: order.items.map((orderItem) => ({
+        id: orderItem.id,
+        name: orderItem.name,
+        price: orderItem.price,
+        quantity: orderItem.quantity,
+        order_id: order.id,
+        product_id: orderItem.productId,
+      })),
+    });
+
   });
 
   it("should find an order", async () => {
@@ -171,7 +203,7 @@ describe("Order repository test", () => {
     const orderRepository = new OrderRepository();
 
     // Create customer
-    const customer = new Customer("123", "Customer 1");
+    const customer = new Customer("c1", "Customer 1");
     const address = new Address("Street 1", 1, "Zipcode 1", "City 1");
     customer.changeAddress(address);
 
@@ -194,7 +226,7 @@ describe("Order repository test", () => {
     );
 
     // Create order
-    const order = new Order("123", "123", [orderItem1]);
+    const order = new Order("o1", customer.id, [orderItem1]);
 
     // Create order on DB
     await orderRepository.create(order);
@@ -215,7 +247,7 @@ describe("Order repository test", () => {
     const orderRepository = new OrderRepository();
 
     // Create customer
-    const customer = new Customer("123", "Customer 1");
+    const customer = new Customer("c1", "Customer 1");
     const address = new Address("Street 1", 1, "Zipcode 1", "City 1");
     customer.changeAddress(address);
 
@@ -252,9 +284,9 @@ describe("Order repository test", () => {
     );
 
     // Create order
-    const order1 = new Order("o1", "123", [orderItem1]);
-    const order2 = new Order("o2", "123", [orderItem2]);
-    const order3 = new Order("o3", "123", [orderItem3]);
+    const order1 = new Order("o1", customer.id, [orderItem1]);
+    const order2 = new Order("o2", customer.id, [orderItem2]);
+    const order3 = new Order("o3", customer.id, [orderItem3]);
 
     // Create order on DB
     await orderRepository.create(order1);
